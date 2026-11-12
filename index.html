@@ -3,14 +3,14 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
-<title>Link Stash</title>
+<title>The Vault 🪄</title>
 <link rel="manifest" href="manifest.webmanifest">
-<meta name="theme-color" content="#fdf7fb">
-<meta name="apple-mobile-web-app-capable" content="yes">
-<meta name="mobile-web-app-capable" content="yes">
-<meta name="apple-mobile-web-app-title" content="Link Stash">
 <link rel="apple-touch-icon" href="apple-touch-icon.png">
 <link rel="icon" type="image/png" href="icon-192.png">
+<meta name="theme-color" content="#4a0f1f">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-title" content="The Vault 🪄">
 <style>
 :root{--bg:#fdf7fb;--g1:#fff0f6;--g2:#edf0ff;--card:#fffdfe;--ink:#2b2433;--mute:#7a7285;--line:#eadff0;--brand:#7a56c2;
 --c-recipe:#f6aaa0;--c-food:#f9d08a;--c-location:#97cdec;--c-sale:#cdb2ee;--c-activity:#a8ddb5;--c-ai:#93dcd8;--c-dating:#f8aecb;--c-sports:#ffbf94;--c-travels:#b0bdf3;
@@ -19,9 +19,10 @@ box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:en
 :root[data-theme="dark"]{--bg:#151a1c;--card:#1f2629;--ink:#eceae4;--mute:#97a0a4;--line:#2e373b;--brand:#6fc2a8;color-scheme:dark}
 *{box-sizing:border-box}
 html{scroll-padding-top:env(safe-area-inset-top,0px)}
-body{margin:0;background:var(--bg) linear-gradient(160deg,var(--g1),var(--g2)) fixed;min-height:100vh;color:var(--ink);font:16px/1.45 "Avenir Next",Avenir,"Segoe UI",system-ui,sans-serif}
+body{margin:0;background:radial-gradient(circle at 90% 0%,rgba(240,190,130,.28),transparent 45%) fixed,linear-gradient(160deg,var(--g1),var(--g2)) fixed,var(--bg);min-height:100vh;color:var(--ink);font:16px/1.45 "Avenir Next",Avenir,"Segoe UI",system-ui,sans-serif}
 main{max-width:640px;margin:0 auto;padding:16px 16px 80px}
-h1{font:700 34px/1.1 Georgia,"Iowan Old Style",serif;margin:8px 0 14px;background:linear-gradient(90deg,#f08fb4,#a98be6,#7fb5ea);-webkit-background-clip:text;background-clip:text;color:transparent;display:inline-block}
+h1{font:700 34px/1.1 Georgia,"Iowan Old Style",serif;margin:8px 0 14px}
+.gt{background:linear-gradient(90deg,#ffe0c2,#f7a9b8,#e2b3f2);-webkit-background-clip:text;background-clip:text;color:transparent}
 input,textarea,select,button{font:inherit;color:inherit}
 input,textarea{width:100%;padding:11px 12px;border:1px solid var(--line);border-radius:10px;background:var(--card);margin-bottom:8px}
 textarea{resize:vertical;min-height:56px}
@@ -35,7 +36,7 @@ details{background:var(--card);border:1px solid var(--line);box-shadow:0 6px 20p
 summary{cursor:pointer;padding:10px 0;font-weight:600;color:var(--brand)}
 form{padding-bottom:10px}
 .cats{display:flex;flex-wrap:wrap;gap:6px;margin-bottom:8px}
-.btn{border:0;background:linear-gradient(90deg,#f7a8c8,#bba3f0);color:#2b2140;padding:11px 18px;border-radius:999px;font-weight:700;cursor:pointer}
+.btn{border:0;background:linear-gradient(90deg,#f8d3b0,#f0a6b8);color:#3a0d1a;padding:11px 18px;border-radius:999px;font-weight:700;cursor:pointer}
 :root[data-theme="dark"] .btn{color:#10201b}
 .ghost{background:none;border:1px solid var(--line);color:var(--ink)}
 .item{background:linear-gradient(135deg,color-mix(in srgb,var(--cc) 18%,var(--card)),var(--card) 70%);border:1px solid color-mix(in srgb,var(--cc) 50%,transparent);border-left:7px solid var(--cc);border-radius:20px;padding:13px 16px;margin:12px 0;box-shadow:0 6px 18px color-mix(in srgb,var(--cc) 30%,transparent)}
@@ -56,14 +57,43 @@ form{padding-bottom:10px}
 .rm{flex:none;width:40px;height:40px;border:0;border-radius:50%;font-size:18px;cursor:pointer;background:color-mix(in srgb,var(--cc) 40%,transparent)}
 .rm.on{background:var(--cc)}
 .note{background:color-mix(in srgb,var(--cc) 20%,transparent);border-radius:12px;padding:8px 12px;color:var(--ink)}
+[hidden]{display:none!important}
+.top{display:flex;align-items:center;justify-content:space-between;gap:10px}
+.themebtn{width:42px;height:42px;flex:none;border-radius:50%;border:1px solid var(--line);background:var(--card);font-size:19px;cursor:pointer;padding:0}
+#back{display:flex;align-items:center;gap:12px;margin:10px 0 4px}
+#catTitle{font:700 24px/1.1 Georgia,serif;margin:0}
+.back{background:var(--card);border:1px solid var(--line);color:var(--ink);border-radius:999px;padding:8px 15px;cursor:pointer}
+.tiles{display:grid;grid-template-columns:1fr 1fr;gap:14px;margin:12px 0}
+.tile{aspect-ratio:1/1;border:0;border-radius:28px;background:linear-gradient(145deg,var(--cc),color-mix(in srgb,var(--cc) 65%,#fff));color:#3a1426;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:6px;cursor:pointer;box-shadow:0 10px 24px color-mix(in srgb,var(--cc) 35%,transparent);transition:transform .12s}
+.tile:active{transform:scale(.96)}
+.tile .em{font-size:54px;line-height:1}
+.tile b{font-size:18px}
+.tile .n{font-size:13px;opacity:.75}
+.tile.wide{grid-column:1/-1;aspect-ratio:auto;flex-direction:row;padding:14px;gap:10px}
+.tile.wide .em{font-size:28px}
+:root[data-theme="light"]{--bg:#fdf7fb;--g1:#fff0f6;--g2:#edf0ff;--card:#fffdfe;--ink:#2b2433;--mute:#7a7285;--line:#eadff0;--brand:#7a56c2;color-scheme:light}
+:root[data-theme="light"] .gt{background:linear-gradient(90deg,#d9668f,#8f6bd6,#5a8fd6);-webkit-background-clip:text;background-clip:text}
+:root:not([data-theme="light"]) .foot .ghost{color:#f2b9a3;border-color:#a8566a}
+.tiles{grid-template-columns:repeat(4,1fr);gap:10px}
+.tile{border-radius:20px;gap:3px;padding:4px;min-width:0}
+.tile .em{font-size:30px}
+.tile b{font-size:12px;max-width:100%;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.tile .n{font-size:10.5px}
+.tiles{grid-template-columns:repeat(3,1fr);gap:12px}
+.tile{border-radius:24px;gap:4px}
+.tile .em{font-size:40px}
+.tile b{font-size:14px}
+.tile .n{font-size:11.5px}
 :focus-visible{outline:2px solid var(--brand);outline-offset:2px}
 @media (prefers-color-scheme:dark){:root:not([data-theme="light"]){--g1:#251c2e;--g2:#171d30}}
 :root[data-theme="dark"]{--g1:#251c2e;--g2:#171d30}
+:root,:root:not([data-theme="light"]),:root[data-theme="dark"]{--bg:#4a0f1f;--g1:#6b1a30;--g2:#2d1033;--card:#5a1a2c;--ink:#fbeee6;--mute:#dcb8b8;--line:#8a3049;--brand:#f2c6a0;color-scheme:dark}
+::placeholder{color:var(--mute);opacity:.85}
 </style>
 </head>
 <body>
 <main>
-<h1>Link Stash</h1>
+<div class="top"><h1><span class="gt">The Vault</span> 🪄</h1><button class="themebtn" id="theme" type="button" aria-label="Switch between light and dark mode" title="Light / dark mode">☀️</button></div>
 <details id="add"><summary id="addTitle">Save a link</summary>
 <form id="f" autocomplete="off">
 <input id="url" type="url" inputmode="url" placeholder="Paste link" required>
@@ -76,7 +106,8 @@ form{padding-bottom:10px}
 <button class="btn ghost" type="button" id="cancel" hidden>Cancel</button>
 </form></details>
 <div class="search"><input id="q" type="search" placeholder="Search title, link, keywords, notes"></div>
-<div class="chips" id="filters"></div>
+<div id="back" hidden><button class="back" id="backBtn" type="button">‹ Back</button><h2 id="catTitle"></h2></div>
+<div class="tiles" id="filters"></div>
 <div id="list"></div>
 <div class="foot">
 <button class="btn ghost" id="exp">Export backup</button>
@@ -96,6 +127,11 @@ function esc(s){return String(s).replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;',
 function host(u){try{return new URL(u).hostname.replace(/^www\./,'')}catch(e){return u}}
 const NAMES={youtu:'YouTube',youtube:'YouTube',tiktok:'TikTok',instagram:'Instagram',threads:'Threads',facebook:'Facebook',fb:'Facebook',twitter:'X',x:'X',shopee:'Shopee',lazada:'Lazada',google:'Google',pinterest:'Pinterest',reddit:'Reddit',xiaohongshu:'Xiaohongshu',xhslink:'Xiaohongshu',whatsapp:'WhatsApp',telegram:'Telegram',grab:'Grab',tripadvisor:'Tripadvisor'};
 function brand(u){const h=host(u).split('.');let b=h.length>1?h[h.length-2]:h[0];if(['co','com','org','net'].includes(b)&&h.length>2)b=h[h.length-3];b=b.toLowerCase();return NAMES[b]||b.charAt(0).toUpperCase()+b.slice(1)}
+const BADGES={TikTok:['#111','♪'],Instagram:['linear-gradient(45deg,#f9ce34,#ee2a7b,#6228d7)','📷'],Threads:['#111','@'],YouTube:['#f00','▶'],Facebook:['#1877f2','f'],X:['#111','𝕏'],Shopee:['#ee4d2d','🛍'],Lazada:['#0f146d','🛒'],Pinterest:['#e60023','P'],Reddit:['#ff4500','👽'],WhatsApp:['#25d366','💬'],Telegram:['#2aabee','✈'],Google:['#4285f4','G'],Grab:['#00b14f','G'],Tripadvisor:['#34e0a1','🦉'],Xiaohongshu:['#ff2442','书']};
+function rootHost(u){const h=host(u).split('.');return h.slice(['co','com','org','net'].includes(h[h.length-2])&&h.length>2?-3:-2).join('.')}
+function favHTML(u){const b=brand(u),bd=BADGES[b];
+ if(bd)return `<span class="fav" title="${esc(b)}" style="background:${bd[0]};color:#fff">${bd[1]}</span>`;
+ return `<span class="fav" title="${esc(b)}">${esc(b.charAt(0))}<img src="https://www.google.com/s2/favicons?domain=${encodeURIComponent(rootHost(u))}&sz=64" alt="" loading="lazy" onerror="this.remove()"></span>`}
 function drawPick(){$('catPick').innerHTML=Object.entries(CATS).map(([k,v])=>`<button type="button" class="chip" style="--cc:var(${v[1]})" data-k="${k}" aria-pressed="${k===pick}">${v[0]}</button>`).join('')}
 function drawFilters(){
  const cnt=k=>items.filter(i=>k==='all'||i.cat===k).length;
@@ -105,7 +141,7 @@ function drawList(){
  const rows=items.filter(i=>(filter==='all'||i.cat===filter)&&(!q||q.split(/\s+/).every(w=>[i.title,i.url,i.note,i.tags.join(' '),CATS[i.cat][0]].join(' ').toLowerCase().includes(w))));
  $('list').innerHTML=rows.length?rows.map(i=>`<div class="item" style="--cc:var(${CATS[i.cat][1]})">
 <div class="cat">${CATS[i.cat][0]}</div>
-<div class="row"><span class="fav" title="${esc(brand(i.url))}">${esc(brand(i.url).charAt(0))}<img src="https://www.google.com/s2/favicons?domain=${encodeURIComponent(host(i.url))}&sz=64" alt="" loading="lazy" onerror="this.remove()"></span><div class="main"><a class="t" href="${esc(i.url)}" target="_blank" rel="noopener noreferrer">${esc(i.title||brand(i.url))}</a>${i.title?`<div class="host">${esc(brand(i.url))}</div>`:''}</div>${i.note?`<button class="rm" data-r="${i.id}" aria-label="Show remark" title="Remark">📝</button>`:''}</div>
+<div class="row">${favHTML(i.url)}<div class="main"><a class="t" href="${esc(i.url)}" target="_blank" rel="noopener noreferrer">${esc(i.title||brand(i.url))}</a>${i.title?`<div class="host">${esc(brand(i.url))}</div>`:''}</div>${i.note?`<button class="rm" data-r="${i.id}" aria-label="Show remark" title="Remark">📝</button>`:''}</div>
 ${i.note?`<p class="note" id="n-${i.id}" hidden>${esc(i.note)}</p>`:''}
 
 ${i.by?`<div class="host">added by ${esc(i.by)}</div>`:''}${(!cloud||i.mine)?`<div class="acts"><button data-e="${i.id}">Edit</button><button data-d="${i.id}">Delete</button></div>`:''}</div>`).join('')
@@ -149,6 +185,27 @@ $('url').addEventListener('input',()=>{const u=$('url').value.trim();if(!/^https
  if(!$('tags').value||$('tags').value===autoT){autoT=w.join(', ');$('tags').value=autoT}
  const t=guessTitle(u);if(t&&(!$('title').value||$('title').value===autoTi)){autoTi=t;$('title').value=t}
  if(!touched){const g=guessCat(w);if(g){pick=g;drawPick()}}});
+let view='home',lastView='home';
+function readHash(){const h=location.hash.slice(1);view=(CATS[h]||h==='all')?h:'home'}
+function drawFilters(){
+ const cnt=k=>items.filter(i=>k==='all'||i.cat===k).length;
+ const tile=([k,v])=>{const sp=v[0].indexOf(' '),n=cnt(k);return `<button class="tile" style="--cc:var(${v[1]})" data-k="${k}"><span class="em">${v[0].slice(0,sp)}</span><b>${v[0].slice(sp+1)}</b><span class="n">${n} link${n===1?'':'s'}</span></button>`};
+ $('filters').innerHTML=Object.entries(CATS).map(tile).join('')}
+function draw(){
+ readHash();const home=view==='home',q=$('q').value.trim();
+ filter=home?'all':view;
+ $('back').hidden=home;$('filters').hidden=!home||!!q;$('list').hidden=home&&!q;
+ if(!home){$('catTitle').textContent=view==='all'?'✨ All links':CATS[view][0];if(!touched&&!editId&&view!=='all'){pick=view;drawPick()}}
+ if(view!==lastView){lastView=view;window.scrollTo(0,0)}
+ drawFilters();drawList()}
+$('filters').onclick=e=>{const k=e.target.closest('[data-k]');if(k)location.hash=k.dataset.k};
+$('q').oninput=draw;
+$('backBtn').onclick=()=>{location.hash=''};
+window.addEventListener('hashchange',draw);
+function setTheme(t){document.documentElement.dataset.theme=t;$('theme').textContent=t==='dark'?'☀️':'🌙';const m=document.querySelector('meta[name="theme-color"]');if(m)m.content=t==='dark'?'#4a0f1f':'#fdf7fb';try{localStorage.setItem('vault.theme',t)}catch(e){}}
+let savedTheme='dark';try{savedTheme=localStorage.getItem('vault.theme')||'dark'}catch(e){}
+$('theme').onclick=()=>setTheme(document.documentElement.dataset.theme==='dark'?'light':'dark');
+setTheme(savedTheme);
 load();drawPick();draw();
 // Share target: receive links shared from other apps (Android installed PWA)
 try{const p=new URLSearchParams(location.search);let u=p.get('url')||'';

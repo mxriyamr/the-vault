@@ -1,12 +1,12 @@
 {
- "name": "Link Stash",
- "short_name": "Link Stash",
+ "name": "The Vault 🪄",
+ "short_name": "The Vault 🪄",
  "description": "Save and search links by category",
  "start_url": "./",
  "scope": "./",
  "display": "standalone",
- "background_color": "#fdf7fb",
- "theme_color": "#fdf7fb",
+ "background_color": "#4a0f1f",
+ "theme_color": "#4a0f1f",
  "icons": [
   {
    "src": "icon-192.png",

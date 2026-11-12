@@ -10,12 +10,14 @@ if(firebaseConfig.apiKey&&!firebaseConfig.apiKey.startsWith("PASTE")){
   const col=collection(db,"links"),me=auth.currentUser.uid,by=document.getElementById("by");
   try{by.value=localStorage.getItem("linkstash.name")||""}catch(e){}
   by.hidden=false;
-  const name=()=>{const v=by.value.trim();try{localStorage.setItem("linkstash.name",v)}catch(e){}return v};
+  const saved=()=>{try{return localStorage.getItem("linkstash.name")||""}catch(e){return ""}};
+  const name=()=>{const v=by.value.trim()||saved();if(v){try{localStorage.setItem("linkstash.name",v)}catch(e){}}return v};
+  document.getElementById("f").addEventListener("reset",()=>setTimeout(()=>{by.value=saved()},0));
   setCloud({
    add:o=>addDoc(col,{...o,uid:me,by:name(),added:Date.now()}),
    update:(id,o)=>updateDoc(doc(db,"links",id),o),
    del:id=>deleteDoc(doc(db,"links",id))
   });
-  onSnapshot(query(col,orderBy("added","desc")),s=>setItems(s.docs.map(d=>{const x=d.data();return {title:"",note:"",tags:[],...x,id:d.id,mine:x.uid===me}})));
+  onSnapshot(query(col,orderBy("added","desc")),s=>setItems(s.docs.map(d=>{const x=d.data();return {title:"",note:"",tags:[],...x,cat:(CATS[x.cat]?x.cat:"activity"),id:d.id,mine:x.uid===me}})));
  }catch(e){console.error("Shared mode failed, using this device only",e)}
 }
