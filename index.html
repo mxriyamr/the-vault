@@ -50,7 +50,8 @@ form{padding-bottom:10px}
 .empty{text-align:center;color:var(--mute);padding:36px 10px}
 .foot{display:flex;gap:8px;flex-wrap:wrap;margin-top:24px}
 .row{display:flex;gap:10px;align-items:center}
-.fav{width:42px;height:42px;flex:none;object-fit:contain;background:#fff;border-radius:13px;padding:6px;box-shadow:0 3px 10px color-mix(in srgb,var(--cc) 45%,transparent)}
+.fav{position:relative;width:42px;height:42px;flex:none;display:grid;place-items:center;font-weight:700;color:#2b2140;background:var(--cc);border-radius:13px;box-shadow:0 3px 10px color-mix(in srgb,var(--cc) 45%,transparent)}
+.fav img{position:absolute;inset:0;width:100%;height:100%;object-fit:contain;background:#fff;border-radius:13px;padding:6px}
 .main{flex:1;min-width:0}
 .rm{flex:none;width:40px;height:40px;border:0;border-radius:50%;font-size:18px;cursor:pointer;background:color-mix(in srgb,var(--cc) 40%,transparent)}
 .rm.on{background:var(--cc)}
@@ -93,6 +94,8 @@ function load(){try{items=JSON.parse(localStorage.getItem(KEY)||'[]')}catch(e){i
 function save(){if(cloud)return;try{localStorage.setItem(KEY,JSON.stringify(items))}catch(e){alert('Could not save in this browser. Use Export backup.')}}
 function esc(s){return String(s).replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]))}
 function host(u){try{return new URL(u).hostname.replace(/^www\./,'')}catch(e){return u}}
+const NAMES={youtu:'YouTube',youtube:'YouTube',tiktok:'TikTok',instagram:'Instagram',threads:'Threads',facebook:'Facebook',fb:'Facebook',twitter:'X',x:'X',shopee:'Shopee',lazada:'Lazada',google:'Google',pinterest:'Pinterest',reddit:'Reddit',xiaohongshu:'Xiaohongshu',xhslink:'Xiaohongshu',whatsapp:'WhatsApp',telegram:'Telegram',grab:'Grab',tripadvisor:'Tripadvisor'};
+function brand(u){const h=host(u).split('.');let b=h.length>1?h[h.length-2]:h[0];if(['co','com','org','net'].includes(b)&&h.length>2)b=h[h.length-3];b=b.toLowerCase();return NAMES[b]||b.charAt(0).toUpperCase()+b.slice(1)}
 function drawPick(){$('catPick').innerHTML=Object.entries(CATS).map(([k,v])=>`<button type="button" class="chip" style="--cc:var(${v[1]})" data-k="${k}" aria-pressed="${k===pick}">${v[0]}</button>`).join('')}
 function drawFilters(){
  const cnt=k=>items.filter(i=>k==='all'||i.cat===k).length;
@@ -102,7 +105,7 @@ function drawList(){
  const rows=items.filter(i=>(filter==='all'||i.cat===filter)&&(!q||q.split(/\s+/).every(w=>[i.title,i.url,i.note,i.tags.join(' '),CATS[i.cat][0]].join(' ').toLowerCase().includes(w))));
  $('list').innerHTML=rows.length?rows.map(i=>`<div class="item" style="--cc:var(${CATS[i.cat][1]})">
 <div class="cat">${CATS[i.cat][0]}</div>
-<div class="row"><img class="fav" src="https://www.google.com/s2/favicons?domain=${encodeURIComponent(host(i.url))}&sz=64" alt="" loading="lazy" onerror="this.style.visibility='hidden'"><div class="main"><a class="t" href="${esc(i.url)}" target="_blank" rel="noopener noreferrer">${esc(i.title||host(i.url))}</a><div class="host">${esc(host(i.url))}</div></div>${i.note?`<button class="rm" data-r="${i.id}" aria-label="Show remark" title="Remark">📝</button>`:''}</div>
+<div class="row"><span class="fav" title="${esc(brand(i.url))}">${esc(brand(i.url).charAt(0))}<img src="https://www.google.com/s2/favicons?domain=${encodeURIComponent(host(i.url))}&sz=64" alt="" loading="lazy" onerror="this.remove()"></span><div class="main"><a class="t" href="${esc(i.url)}" target="_blank" rel="noopener noreferrer">${esc(i.title||brand(i.url))}</a>${i.title?`<div class="host">${esc(brand(i.url))}</div>`:''}</div>${i.note?`<button class="rm" data-r="${i.id}" aria-label="Show remark" title="Remark">📝</button>`:''}</div>
 ${i.note?`<p class="note" id="n-${i.id}" hidden>${esc(i.note)}</p>`:''}
 
 ${i.by?`<div class="host">added by ${esc(i.by)}</div>`:''}${(!cloud||i.mine)?`<div class="acts"><button data-e="${i.id}">Edit</button><button data-d="${i.id}">Delete</button></div>`:''}</div>`).join('')
