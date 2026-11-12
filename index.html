@@ -1,0 +1,151 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Link Stash</title>
+<link rel="manifest" href="manifest.webmanifest">
+<meta name="theme-color" content="#fdf7fb">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-title" content="Link Stash">
+<link rel="apple-touch-icon" href="apple-touch-icon.png">
+<link rel="icon" type="image/png" href="icon-192.png">
+<style>
+:root{--bg:#fdf7fb;--g1:#fff0f6;--g2:#edf0ff;--card:#fffdfe;--ink:#2b2433;--mute:#7a7285;--line:#eadff0;--brand:#7a56c2;
+--c-recipe:#f6aaa0;--c-food:#f9d08a;--c-location:#97cdec;--c-sale:#cdb2ee;--c-activity:#a8ddb5;--c-ai:#93dcd8;--c-dating:#f8aecb;--c-sports:#ffbf94;--c-travels:#b0bdf3;
+box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px);color-scheme:light}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){--bg:#151a1c;--card:#1f2629;--ink:#eceae4;--mute:#97a0a4;--line:#2e373b;--brand:#6fc2a8;color-scheme:dark}}
+:root[data-theme="dark"]{--bg:#151a1c;--card:#1f2629;--ink:#eceae4;--mute:#97a0a4;--line:#2e373b;--brand:#6fc2a8;color-scheme:dark}
+*{box-sizing:border-box}
+html{scroll-padding-top:env(safe-area-inset-top,0px)}
+body{margin:0;background:var(--bg) linear-gradient(160deg,var(--g1),var(--g2)) fixed;min-height:100vh;color:var(--ink);font:16px/1.45 "Avenir Next",Avenir,"Segoe UI",system-ui,sans-serif}
+main{max-width:640px;margin:0 auto;padding:16px 16px 80px}
+h1{font:700 34px/1.1 Georgia,"Iowan Old Style",serif;margin:8px 0 14px;background:linear-gradient(90deg,#f08fb4,#a98be6,#7fb5ea);-webkit-background-clip:text;background-clip:text;color:transparent;display:inline-block}
+input,textarea,select,button{font:inherit;color:inherit}
+input,textarea{width:100%;padding:11px 12px;border:1px solid var(--line);border-radius:10px;background:var(--card);margin-bottom:8px}
+textarea{resize:vertical;min-height:56px}
+.search{position:sticky;top:env(safe-area-inset-top,0px);background:color-mix(in srgb,var(--bg) 75%,transparent);backdrop-filter:blur(10px);padding:6px 0;z-index:5}
+.search input{margin:0;font-size:17px}
+.chips{display:flex;gap:6px;overflow-x:auto;padding:8px 0;scrollbar-width:none}
+.chip{flex:none;border:1.5px solid var(--cc,var(--line));background:var(--card);border-radius:999px;padding:6px 13px;cursor:pointer;white-space:nowrap}
+.chip[aria-pressed="true"]{background:var(--cc,var(--brand));color:#2b2140;border-color:transparent;font-weight:600;box-shadow:0 3px 10px color-mix(in srgb,var(--cc,var(--brand)) 55%,transparent)}
+.chip .n{opacity:.6;margin-left:4px;font-size:13px}
+details{background:var(--card);border:1px solid var(--line);box-shadow:0 6px 20px rgba(160,130,200,.14);border-radius:20px;padding:4px 14px;margin:6px 0 10px}
+summary{cursor:pointer;padding:10px 0;font-weight:600;color:var(--brand)}
+form{padding-bottom:10px}
+.cats{display:flex;flex-wrap:wrap;gap:6px;margin-bottom:8px}
+.btn{border:0;background:linear-gradient(90deg,#f7a8c8,#bba3f0);color:#2b2140;padding:11px 18px;border-radius:999px;font-weight:700;cursor:pointer}
+:root[data-theme="dark"] .btn{color:#10201b}
+.ghost{background:none;border:1px solid var(--line);color:var(--ink)}
+.item{background:linear-gradient(135deg,color-mix(in srgb,var(--cc) 18%,var(--card)),var(--card) 70%);border:1px solid color-mix(in srgb,var(--cc) 50%,transparent);border-left:7px solid var(--cc);border-radius:20px;padding:13px 16px;margin:12px 0;box-shadow:0 6px 18px color-mix(in srgb,var(--cc) 30%,transparent)}
+.item a.t{font-weight:600;color:var(--ink);text-decoration:none;word-break:break-word}
+.host{color:var(--mute);font-size:13px;word-break:break-all}
+.cat{display:inline-block;background:var(--cc);color:#2b2140;padding:2px 11px;border-radius:999px;font-size:12.5px;font-weight:700;margin-bottom:5px}
+.note{margin:6px 0 0;color:var(--mute);font-size:14px}
+.tags{display:flex;flex-wrap:wrap;gap:4px;margin-top:6px}
+.tag{font-size:12px;background:color-mix(in srgb,var(--cc) 30%,transparent);border-radius:999px;padding:2px 7px;color:var(--mute);cursor:pointer}
+.acts{display:flex;gap:14px;margin-top:8px}
+.acts button{background:none;border:0;color:var(--mute);padding:2px 0;cursor:pointer;font-size:14px}
+.empty{text-align:center;color:var(--mute);padding:36px 10px}
+.foot{display:flex;gap:8px;flex-wrap:wrap;margin-top:24px}
+:focus-visible{outline:2px solid var(--brand);outline-offset:2px}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){--g1:#251c2e;--g2:#171d30}}
+:root[data-theme="dark"]{--g1:#251c2e;--g2:#171d30}
+</style>
+</head>
+<body>
+<main>
+<h1>Link Stash</h1>
+<details id="add"><summary id="addTitle">Save a link</summary>
+<form id="f" autocomplete="off">
+<input id="url" type="url" inputmode="url" placeholder="Paste link" required>
+<input id="title" placeholder="Title (optional)">
+<div class="cats" id="catPick"></div>
+<input id="tags" placeholder="Keywords (auto-filled from the link, editable)">
+<textarea id="note" placeholder="Note (optional)"></textarea>
+<button class="btn" id="saveBtn">Save link</button>
+<button class="btn ghost" type="button" id="cancel" hidden>Cancel</button>
+</form></details>
+<div class="search"><input id="q" type="search" placeholder="Search title, link, keywords, notes"></div>
+<div class="chips" id="filters"></div>
+<div id="list"></div>
+<div class="foot">
+<button class="btn ghost" id="exp">Export backup</button>
+<button class="btn ghost" id="imp">Import backup</button>
+<input type="file" id="file" accept="application/json" hidden>
+</div>
+</main>
+<script>
+const CATS={recipe:['🍳 Recipe','--c-recipe'],food:['🍜 Food','--c-food'],location:['📍 Location','--c-location'],sale:['🏷️ Sale','--c-sale'],activity:['🎈 Activity','--c-activity'],ai:['🤖 AI','--c-ai'],sports:['⚽ Sports','--c-sports'],travels:['✈️ Travels','--c-travels']};
+const KEY='linkstash.v1';
+let items=[],filter='all',pick='recipe',editId=null,touched=false,autoT='',autoTi='';
+const $=id=>document.getElementById(id);
+function load(){try{items=JSON.parse(localStorage.getItem(KEY)||'[]')}catch(e){items=[]}items.forEach(i=>{if(!CATS[i.cat])i.cat='activity';i.tags=i.tags||[]})}
+function save(){try{localStorage.setItem(KEY,JSON.stringify(items))}catch(e){alert('Could not save in this browser. Use Export backup.')}}
+function esc(s){return String(s).replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]))}
+function host(u){try{return new URL(u).hostname.replace(/^www\./,'')}catch(e){return u}}
+function drawPick(){$('catPick').innerHTML=Object.entries(CATS).map(([k,v])=>`<button type="button" class="chip" style="--cc:var(${v[1]})" data-k="${k}" aria-pressed="${k===pick}">${v[0]}</button>`).join('')}
+function drawFilters(){
+ const cnt=k=>items.filter(i=>k==='all'||i.cat===k).length;
+ $('filters').innerHTML=[['all',['✨ All']],...Object.entries(CATS)].map(([k,v])=>`<button class="chip" style="${v[1]?'--cc:var('+v[1]+')':''}" data-k="${k}" aria-pressed="${k===filter}">${v[0]}<span class="n">${cnt(k)}</span></button>`).join('')}
+function drawList(){
+ const q=$('q').value.trim().toLowerCase();
+ const rows=items.filter(i=>(filter==='all'||i.cat===filter)&&(!q||q.split(/\s+/).every(w=>[i.title,i.url,i.note,i.tags.join(' '),CATS[i.cat][0]].join(' ').toLowerCase().includes(w))));
+ $('list').innerHTML=rows.length?rows.map(i=>`<div class="item" style="--cc:var(${CATS[i.cat][1]})">
+<div class="cat">${CATS[i.cat][0]}</div>
+<a class="t" href="${esc(i.url)}" target="_blank" rel="noopener noreferrer">${esc(i.title||host(i.url))}</a>
+<div class="host">${esc(host(i.url))}</div>
+${i.note?`<p class="note">${esc(i.note)}</p>`:''}
+${i.tags.length?`<div class="tags">${i.tags.map(t=>`<span class="tag" data-t="${esc(t)}">${esc(t)}</span>`).join('')}</div>`:''}
+<div class="acts"><button data-e="${i.id}">Edit</button><button data-d="${i.id}">Delete</button></div></div>`).join('')
+ :`<div class="empty">${items.length?'No links match. Try another word or category.':'Nothing saved yet. Open “Save a link” and paste your first one.'}</div>`}
+function draw(){drawFilters();drawList()}
+function reset(){editId=null;touched=false;autoT='';autoTi='';$('f').reset();pick='recipe';drawPick();$('addTitle').textContent='Save a link';$('saveBtn').textContent='Save link';$('cancel').hidden=true}
+$('catPick').onclick=e=>{const k=e.target.closest('[data-k]');if(k){pick=k.dataset.k;touched=true;drawPick()}};
+$('filters').onclick=e=>{const k=e.target.closest('[data-k]');if(k){filter=k.dataset.k;draw()}};
+$('q').oninput=drawList;
+$('cancel').onclick=()=>{reset();$('add').open=false};
+$('f').onsubmit=e=>{e.preventDefault();
+ const o={url:$('url').value.trim(),title:$('title').value.trim(),cat:pick,note:$('note').value.trim(),tags:$('tags').value.split(',').map(s=>s.trim().toLowerCase()).filter(Boolean)};
+ if(editId){const i=items.find(x=>x.id===editId);Object.assign(i,o)}else items.unshift({id:Date.now().toString(36),added:Date.now(),...o});
+ save();reset();$('add').open=false;draw()};
+$('list').onclick=e=>{
+ const t=e.target.closest('[data-t]');if(t){$('q').value=t.dataset.t;drawList();return}
+ const d=e.target.closest('[data-d]');if(d&&confirm('Delete this link?')){items=items.filter(i=>i.id!==d.dataset.d);save();draw();return}
+ const ed=e.target.closest('[data-e]');if(ed){const i=items.find(x=>x.id===ed.dataset.e);editId=i.id;pick=i.cat;touched=true;drawPick();
+  $('url').value=i.url;$('title').value=i.title;$('tags').value=i.tags.join(', ');$('note').value=i.note;
+  $('addTitle').textContent='Edit link';$('saveBtn').textContent='Save changes';$('cancel').hidden=false;$('add').open=true;window.scrollTo({top:0,behavior:'smooth'})}};
+$('exp').onclick=()=>{const a=document.createElement('a');a.href='data:application/json;charset=utf-8,'+encodeURIComponent(JSON.stringify(items,null,1));a.download='link-stash-backup.json';a.click()};
+$('imp').onclick=()=>$('file').click();
+$('file').onchange=async e=>{try{const d=JSON.parse(await e.target.files[0].text());const ids=new Set(items.map(i=>i.id));
+ d.filter(i=>i&&i.url&&CATS[i.cat]&&!ids.has(i.id)).forEach(i=>items.push({tags:[],note:'',title:'',...i}));save();draw()}catch(x){alert('That file is not a valid backup.')}};
+const STOP=new Set('www com net org html htm php aspx index https http amp utm the and for with how what from your you this that are all new best top'.split(' '));
+const GUESS={ai:'ai chatgpt openai gpt claude llm midjourney anthropic gemini',sports:'sport sports football soccer nba fifa match gym running fitness basketball tennis',travels:'travel hotel hotels flight flights trip booking airbnb tripadvisor agoda itinerary',recipe:'recipe recipes cook cooking bake baking ingredients dessert',food:'restaurant restaurants cafe menu food eat dining ubereats foodpanda yelp',sale:'sale deal deals discount coupon promo shopee lazada amazon voucher',location:'maps map place address directions',activity:'event events activities activity workshop class'};
+function safeDec(s){try{return decodeURIComponent(s)}catch(e){return s}}
+function words(u){let x;try{x=new URL(u)}catch(e){return null}
+ const h=x.hostname.replace(/^www[.]/,'').split('.');let parts=[h.length>1?h[h.length-2]:h[0]];
+ x.pathname.split('/').forEach(s=>parts.push(safeDec(s)));
+ ['q','query','s','search','k'].forEach(k=>{const v=x.searchParams.get(k);if(v)parts.push(v)});
+ const out=[];parts.join(' ').toLowerCase().split(/[^\p{L}\p{N}]+/u).forEach(w=>{
+  if(w.length>2&&w.length<=20&&!/^[0-9]+$/.test(w)&&!(w.length>8&&/[0-9]/.test(w))&&!STOP.has(w)&&!out.includes(w))out.push(w)});
+ return out.slice(0,8)}
+function guessTitle(u){try{const segs=new URL(u).pathname.split('/').filter(Boolean);const s=safeDec(segs[segs.length-1]||'');
+ const w=s.replace(/[.][a-z0-9]{2,5}$/i,'').split(/[^\p{L}\p{N}]+/u).filter(a=>a&&!/^[0-9]+$/.test(a)&&!(a.length>8&&/[0-9]/.test(a)));
+ return w.length>=2?w.map(a=>a[0].toUpperCase()+a.slice(1)).join(' '):''}catch(e){return ''}}
+function guessCat(w){for(const k in GUESS){if(GUESS[k].split(' ').some(g=>w.includes(g)))return k}return null}
+$('url').addEventListener('input',()=>{const u=$('url').value.trim();if(!/^https?:[/][/].+[.]./.test(u))return;const w=words(u);if(!w)return;
+ if(!$('tags').value||$('tags').value===autoT){autoT=w.join(', ');$('tags').value=autoT}
+ const t=guessTitle(u);if(t&&(!$('title').value||$('title').value===autoTi)){autoTi=t;$('title').value=t}
+ if(!touched){const g=guessCat(w);if(g){pick=g;drawPick()}}});
+load();drawPick();draw();
+// Share target: receive links shared from other apps (Android installed PWA)
+try{const p=new URLSearchParams(location.search);let u=p.get('url')||'';
+ if(!u){const m=(p.get('text')||'').match(/https?:[/][/][^\s]+/);if(m)u=m[0]}
+ if(u){$('url').value=u;$('url').dispatchEvent(new Event('input'));
+  if(p.get('title')&&!$('title').value)$('title').value=p.get('title');
+  $('add').open=true;history.replaceState(null,'',location.pathname)}}catch(e){}
+if('serviceWorker' in navigator)window.addEventListener('load',()=>navigator.serviceWorker.register('sw.js').catch(()=>{}));
+</script>
+</body>
+</html>
