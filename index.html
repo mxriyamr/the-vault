@@ -49,6 +49,12 @@ form{padding-bottom:10px}
 .acts button{background:none;border:0;color:var(--mute);padding:2px 0;cursor:pointer;font-size:14px}
 .empty{text-align:center;color:var(--mute);padding:36px 10px}
 .foot{display:flex;gap:8px;flex-wrap:wrap;margin-top:24px}
+.row{display:flex;gap:10px;align-items:center}
+.fav{width:42px;height:42px;flex:none;object-fit:contain;background:#fff;border-radius:13px;padding:6px;box-shadow:0 3px 10px color-mix(in srgb,var(--cc) 45%,transparent)}
+.main{flex:1;min-width:0}
+.rm{flex:none;width:40px;height:40px;border:0;border-radius:50%;font-size:18px;cursor:pointer;background:color-mix(in srgb,var(--cc) 40%,transparent)}
+.rm.on{background:var(--cc)}
+.note{background:color-mix(in srgb,var(--cc) 20%,transparent);border-radius:12px;padding:8px 12px;color:var(--ink)}
 :focus-visible{outline:2px solid var(--brand);outline-offset:2px}
 @media (prefers-color-scheme:dark){:root:not([data-theme="light"]){--g1:#251c2e;--g2:#171d30}}
 :root[data-theme="dark"]{--g1:#251c2e;--g2:#171d30}
@@ -96,10 +102,9 @@ function drawList(){
  const rows=items.filter(i=>(filter==='all'||i.cat===filter)&&(!q||q.split(/\s+/).every(w=>[i.title,i.url,i.note,i.tags.join(' '),CATS[i.cat][0]].join(' ').toLowerCase().includes(w))));
  $('list').innerHTML=rows.length?rows.map(i=>`<div class="item" style="--cc:var(${CATS[i.cat][1]})">
 <div class="cat">${CATS[i.cat][0]}</div>
-<a class="t" href="${esc(i.url)}" target="_blank" rel="noopener noreferrer">${esc(i.title||host(i.url))}</a>
-<div class="host">${esc(host(i.url))}</div>
-${i.note?`<p class="note">${esc(i.note)}</p>`:''}
-${i.tags.length?`<div class="tags">${i.tags.map(t=>`<span class="tag" data-t="${esc(t)}">${esc(t)}</span>`).join('')}</div>`:''}
+<div class="row"><img class="fav" src="https://www.google.com/s2/favicons?domain=${encodeURIComponent(host(i.url))}&sz=64" alt="" loading="lazy" onerror="this.style.visibility='hidden'"><div class="main"><a class="t" href="${esc(i.url)}" target="_blank" rel="noopener noreferrer">${esc(i.title||host(i.url))}</a><div class="host">${esc(host(i.url))}</div></div>${i.note?`<button class="rm" data-r="${i.id}" aria-label="Show remark" title="Remark">📝</button>`:''}</div>
+${i.note?`<p class="note" id="n-${i.id}" hidden>${esc(i.note)}</p>`:''}
+
 ${i.by?`<div class="host">added by ${esc(i.by)}</div>`:''}${(!cloud||i.mine)?`<div class="acts"><button data-e="${i.id}">Edit</button><button data-d="${i.id}">Delete</button></div>`:''}</div>`).join('')
  :`<div class="empty">${items.length?'No links match. Try another word or category.':'Nothing saved yet. Open “Save a link” and paste your first one.'}</div>`}
 function draw(){drawFilters();drawList()}
@@ -113,6 +118,7 @@ $('f').onsubmit=e=>{e.preventDefault();
  if(cloud){editId?cloud.update(editId,o):cloud.add(o)}else if(editId){const i=items.find(x=>x.id===editId);Object.assign(i,o)}else items.unshift({id:Date.now().toString(36),added:Date.now(),...o});
  save();reset();$('add').open=false;draw()};
 $('list').onclick=e=>{
+ const r=e.target.closest('[data-r]');if(r){const n=document.getElementById('n-'+r.dataset.r);n.hidden=!n.hidden;r.classList.toggle('on',!n.hidden);return}
  const t=e.target.closest('[data-t]');if(t){$('q').value=t.dataset.t;drawList();return}
  const d=e.target.closest('[data-d]');if(d&&confirm('Delete this link?')){if(cloud)cloud.del(d.dataset.d);else{items=items.filter(i=>i.id!==d.dataset.d);save();draw()}return}
  const ed=e.target.closest('[data-e]');if(ed){const i=items.find(x=>x.id===ed.dataset.e);editId=i.id;pick=i.cat;touched=true;drawPick();
