@@ -60,6 +60,7 @@ form{padding-bottom:10px}
 <details id="add"><summary id="addTitle">Save a link</summary>
 <form id="f" autocomplete="off">
 <input id="url" type="url" inputmode="url" placeholder="Paste link" required>
+<input id="by" placeholder="Your name (shown to everyone)" hidden>
 <input id="title" placeholder="Title (optional)">
 <div class="cats" id="catPick"></div>
 <input id="tags" placeholder="Keywords (auto-filled from the link, editable)">
@@ -79,10 +80,11 @@ form{padding-bottom:10px}
 <script>
 const CATS={recipe:['🍳 Recipe','--c-recipe'],food:['🍜 Food','--c-food'],location:['📍 Location','--c-location'],sale:['🏷️ Sale','--c-sale'],activity:['🎈 Activity','--c-activity'],ai:['🤖 AI','--c-ai'],sports:['⚽ Sports','--c-sports'],travels:['✈️ Travels','--c-travels']};
 const KEY='linkstash.v1';
-let items=[],filter='all',pick='recipe',editId=null,touched=false,autoT='',autoTi='';
+let items=[],filter='all',pick='recipe',editId=null,touched=false,autoT='',autoTi='',cloud=null;
+window.setItems=a=>{items=a;draw()};window.setCloud=c=>{cloud=c};
 const $=id=>document.getElementById(id);
 function load(){try{items=JSON.parse(localStorage.getItem(KEY)||'[]')}catch(e){items=[]}items.forEach(i=>{if(!CATS[i.cat])i.cat='activity';i.tags=i.tags||[]})}
-function save(){try{localStorage.setItem(KEY,JSON.stringify(items))}catch(e){alert('Could not save in this browser. Use Export backup.')}}
+function save(){if(cloud)return;try{localStorage.setItem(KEY,JSON.stringify(items))}catch(e){alert('Could not save in this browser. Use Export backup.')}}
 function esc(s){return String(s).replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]))}
 function host(u){try{return new URL(u).hostname.replace(/^www\./,'')}catch(e){return u}}
 function drawPick(){$('catPick').innerHTML=Object.entries(CATS).map(([k,v])=>`<button type="button" class="chip" style="--cc:var(${v[1]})" data-k="${k}" aria-pressed="${k===pick}">${v[0]}</button>`).join('')}
@@ -98,7 +100,7 @@ function drawList(){
 <div class="host">${esc(host(i.url))}</div>
 ${i.note?`<p class="note">${esc(i.note)}</p>`:''}
 ${i.tags.length?`<div class="tags">${i.tags.map(t=>`<span class="tag" data-t="${esc(t)}">${esc(t)}</span>`).join('')}</div>`:''}
-<div class="acts"><button data-e="${i.id}">Edit</button><button data-d="${i.id}">Delete</button></div></div>`).join('')
+${i.by?`<div class="host">added by ${esc(i.by)}</div>`:''}${(!cloud||i.mine)?`<div class="acts"><button data-e="${i.id}">Edit</button><button data-d="${i.id}">Delete</button></div>`:''}</div>`).join('')
  :`<div class="empty">${items.length?'No links match. Try another word or category.':'Nothing saved yet. Open “Save a link” and paste your first one.'}</div>`}
 function draw(){drawFilters();drawList()}
 function reset(){editId=null;touched=false;autoT='';autoTi='';$('f').reset();pick='recipe';drawPick();$('addTitle').textContent='Save a link';$('saveBtn').textContent='Save link';$('cancel').hidden=true}
@@ -108,18 +110,18 @@ $('q').oninput=drawList;
 $('cancel').onclick=()=>{reset();$('add').open=false};
 $('f').onsubmit=e=>{e.preventDefault();
  const o={url:$('url').value.trim(),title:$('title').value.trim(),cat:pick,note:$('note').value.trim(),tags:$('tags').value.split(',').map(s=>s.trim().toLowerCase()).filter(Boolean)};
- if(editId){const i=items.find(x=>x.id===editId);Object.assign(i,o)}else items.unshift({id:Date.now().toString(36),added:Date.now(),...o});
+ if(cloud){editId?cloud.update(editId,o):cloud.add(o)}else if(editId){const i=items.find(x=>x.id===editId);Object.assign(i,o)}else items.unshift({id:Date.now().toString(36),added:Date.now(),...o});
  save();reset();$('add').open=false;draw()};
 $('list').onclick=e=>{
  const t=e.target.closest('[data-t]');if(t){$('q').value=t.dataset.t;drawList();return}
- const d=e.target.closest('[data-d]');if(d&&confirm('Delete this link?')){items=items.filter(i=>i.id!==d.dataset.d);save();draw();return}
+ const d=e.target.closest('[data-d]');if(d&&confirm('Delete this link?')){if(cloud)cloud.del(d.dataset.d);else{items=items.filter(i=>i.id!==d.dataset.d);save();draw()}return}
  const ed=e.target.closest('[data-e]');if(ed){const i=items.find(x=>x.id===ed.dataset.e);editId=i.id;pick=i.cat;touched=true;drawPick();
   $('url').value=i.url;$('title').value=i.title;$('tags').value=i.tags.join(', ');$('note').value=i.note;
   $('addTitle').textContent='Edit link';$('saveBtn').textContent='Save changes';$('cancel').hidden=false;$('add').open=true;window.scrollTo({top:0,behavior:'smooth'})}};
 $('exp').onclick=()=>{const a=document.createElement('a');a.href='data:application/json;charset=utf-8,'+encodeURIComponent(JSON.stringify(items,null,1));a.download='link-stash-backup.json';a.click()};
 $('imp').onclick=()=>$('file').click();
 $('file').onchange=async e=>{try{const d=JSON.parse(await e.target.files[0].text());const ids=new Set(items.map(i=>i.id));
- d.filter(i=>i&&i.url&&CATS[i.cat]&&!ids.has(i.id)).forEach(i=>items.push({tags:[],note:'',title:'',...i}));save();draw()}catch(x){alert('That file is not a valid backup.')}};
+ const ok=d.filter(i=>i&&i.url&&CATS[i.cat]&&(cloud||!ids.has(i.id)));if(cloud)ok.forEach(i=>cloud.add({url:i.url,title:i.title||'',cat:i.cat,note:i.note||'',tags:i.tags||[]}));else{ok.forEach(i=>items.push({tags:[],note:'',title:'',...i}));save();draw()}}catch(x){alert('That file is not a valid backup.')}};
 const STOP=new Set('www com net org html htm php aspx index https http amp utm the and for with how what from your you this that are all new best top'.split(' '));
 const GUESS={ai:'ai chatgpt openai gpt claude llm midjourney anthropic gemini',sports:'sport sports football soccer nba fifa match gym running fitness basketball tennis',travels:'travel hotel hotels flight flights trip booking airbnb tripadvisor agoda itinerary',recipe:'recipe recipes cook cooking bake baking ingredients dessert',food:'restaurant restaurants cafe menu food eat dining ubereats foodpanda yelp',sale:'sale deal deals discount coupon promo shopee lazada amazon voucher',location:'maps map place address directions',activity:'event events activities activity workshop class'};
 function safeDec(s){try{return decodeURIComponent(s)}catch(e){return s}}
@@ -147,5 +149,6 @@ try{const p=new URLSearchParams(location.search);let u=p.get('url')||'';
   $('add').open=true;history.replaceState(null,'',location.pathname)}}catch(e){}
 if('serviceWorker' in navigator)window.addEventListener('load',()=>navigator.serviceWorker.register('sw.js').catch(()=>{}));
 </script>
+<script type="module" src="cloud.js"></script>
 </body>
 </html>

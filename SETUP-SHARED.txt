@@ -1,0 +1,14 @@
+SHARED LINK STASH - Firebase setup (free plan is enough)
+
+1. console.firebase.google.com > Add project (name it link-stash). Turn Google Analytics off.
+2. Build > Authentication > Get started > Sign-in method > enable "Anonymous".
+3. Build > Firestore Database > Create database > start in production mode, pick a region near you (e.g. asia-southeast1).
+4. Firestore > Rules tab > replace everything with the contents of firestore.rules > Publish.
+5. Project settings (gear) > General > "Your apps" > Web (</>) > register app > copy the firebaseConfig values.
+6. Open firebase-config.js and paste apiKey, authDomain, projectId, appId in place of the PASTE_ values.
+7. Upload ALL files to GitHub (replace the old ones). In Firebase: Authentication > Settings > Authorized domains > add YOUR-USERNAME.github.io
+
+Notes:
+- Everyone with the link can see and add links. Each person can edit/delete only the links they added (on the same browser).
+- You can delete anything from the Firebase console (Firestore > links).
+- To copy your old local links in: Export backup on the old version, then Import backup here.
