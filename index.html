@@ -13,7 +13,7 @@
 <meta name="apple-mobile-web-app-title" content="The Vault 🪄">
 <style>
 :root{--bg:#fdf7fb;--g1:#fff0f6;--g2:#edf0ff;--card:#fffdfe;--ink:#2b2433;--mute:#7a7285;--line:#eadff0;--brand:#7a56c2;
---c-recipe:#f6aaa0;--c-food:#f9d08a;--c-location:#97cdec;--c-sale:#cdb2ee;--c-activity:#a8ddb5;--c-ai:#93dcd8;--c-dating:#f8aecb;--c-sports:#ffbf94;--c-travels:#b0bdf3;
+--c-recipe:#f6aaa0;--c-food:#f9d08a;--c-location:#97cdec;--c-sale:#cdb2ee;--c-activity:#a8ddb5;--c-ai:#93dcd8;--c-dating:#f8aecb;--c-sports:#ffbf94;--c-travels:#b0bdf3;--c-finds:#d8e48c;
 box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px);color-scheme:light}
 @media (prefers-color-scheme:dark){:root:not([data-theme="light"]){--bg:#151a1c;--card:#1f2629;--ink:#eceae4;--mute:#97a0a4;--line:#2e373b;--brand:#6fc2a8;color-scheme:dark}}
 :root[data-theme="dark"]{--bg:#151a1c;--card:#1f2629;--ink:#eceae4;--mute:#97a0a4;--line:#2e373b;--brand:#6fc2a8;color-scheme:dark}
@@ -87,6 +87,9 @@ form{padding-bottom:10px}
 .tile{position:relative}
 .tile::after{content:"";position:absolute;top:9%;left:15%;width:28%;height:17%;border-radius:50%;background:rgba(255,255,255,.55);transform:rotate(-32deg);filter:blur(1px);pointer-events:none}
 .tile{box-shadow:0 14px 18px -8px rgba(0,0,0,.5),0 6px 12px color-mix(in srgb,var(--cc) 60%,transparent),inset 0 -6px 10px rgba(0,0,0,.08),inset 0 4px 8px rgba(255,255,255,.35)}
+.btns{display:flex;gap:8px}
+#toast{position:fixed;left:50%;top:calc(env(safe-area-inset-top,0px) + 12px);transform:translateX(-50%);z-index:50;max-width:min(92vw,440px);background:linear-gradient(90deg,#f8d3b0,#f0a6b8);color:#3a0d1a;padding:11px 16px;border-radius:18px;font-weight:600;box-shadow:0 10px 30px rgba(0,0,0,.4);cursor:pointer;animation:tin .35s cubic-bezier(.2,1.2,.4,1)}
+@keyframes tin{from{transform:translate(-50%,-30px);opacity:0}to{transform:translate(-50%,0);opacity:1}}
 :focus-visible{outline:2px solid var(--brand);outline-offset:2px}
 @media (prefers-color-scheme:dark){:root:not([data-theme="light"]){--g1:#251c2e;--g2:#171d30}}
 :root[data-theme="dark"]{--g1:#251c2e;--g2:#171d30}
@@ -95,8 +98,9 @@ form{padding-bottom:10px}
 </style>
 </head>
 <body>
+<div id="toast" role="status" hidden></div>
 <main>
-<div class="top"><h1><span class="gt">The Vault</span> 🪄</h1><button class="themebtn" id="theme" type="button" aria-label="Switch between light and dark mode" title="Light / dark mode">☀️</button></div>
+<div class="top"><h1><span class="gt">The Vault</span> 🪄</h1><span class="btns"><button class="themebtn" id="bell" type="button" aria-label="Turn notifications on or off" title="Notifications">🔕</button><button class="themebtn" id="theme" type="button" aria-label="Switch between light and dark mode" title="Light / dark mode">☀️</button></span></div>
 <details id="add"><summary id="addTitle">Save a link</summary>
 <form id="f" autocomplete="off">
 <input id="url" type="url" inputmode="url" placeholder="Paste link" required>
@@ -119,7 +123,7 @@ form{padding-bottom:10px}
 </div>
 </main>
 <script>
-const CATS={recipe:['🍳 Recipe','--c-recipe'],food:['🍜 Food','--c-food'],location:['📍 Location','--c-location'],sale:['🏷️ Sale','--c-sale'],activity:['🎈 Activity','--c-activity'],ai:['🤖 AI','--c-ai'],sports:['⚽ Sports','--c-sports'],travels:['✈️ Travels','--c-travels']};
+const CATS={recipe:['🍳 Recipe','--c-recipe'],food:['🍜 Food','--c-food'],location:['📍 Location','--c-location'],sale:['🏷️ Sale','--c-sale'],activity:['🎈 Activity','--c-activity'],ai:['🤖 AI','--c-ai'],sports:['⚽ Sports','--c-sports'],travels:['✈️ Travels','--c-travels'],finds:['💡 Useful Finds','--c-finds']};
 const KEY='linkstash.v1';
 let items=[],filter='all',pick='recipe',editId=null,touched=false,autoT='',autoTi='',cloud=null;
 window.setItems=a=>{items=a;draw()};window.setCloud=c=>{cloud=c};
@@ -171,7 +175,7 @@ $('imp').onclick=()=>$('file').click();
 $('file').onchange=async e=>{try{const d=JSON.parse(await e.target.files[0].text());const ids=new Set(items.map(i=>i.id));
  const ok=d.filter(i=>i&&i.url&&CATS[i.cat]&&(cloud||!ids.has(i.id)));if(cloud)ok.forEach(i=>cloud.add({url:i.url,title:i.title||'',cat:i.cat,note:i.note||'',tags:i.tags||[]}));else{ok.forEach(i=>items.push({tags:[],note:'',title:'',...i}));save();draw()}}catch(x){alert('That file is not a valid backup.')}};
 const STOP=new Set('www com net org html htm php aspx index https http amp utm the and for with how what from your you this that are all new best top'.split(' '));
-const GUESS={ai:'ai chatgpt openai gpt claude llm midjourney anthropic gemini',sports:'sport sports football soccer nba fifa match gym running fitness basketball tennis',travels:'travel hotel hotels flight flights trip booking airbnb tripadvisor agoda itinerary',recipe:'recipe recipes cook cooking bake baking ingredients dessert',food:'restaurant restaurants cafe menu food eat dining ubereats foodpanda yelp',sale:'sale deal deals discount coupon promo shopee lazada amazon voucher',location:'maps map place address directions',activity:'event events activities activity workshop class'};
+const GUESS={ai:'ai chatgpt openai gpt claude llm midjourney anthropic gemini',sports:'sport sports football soccer nba fifa match gym running fitness basketball tennis',travels:'travel hotel hotels flight flights trip booking airbnb tripadvisor agoda itinerary',recipe:'recipe recipes cook cooking bake baking ingredients dessert',food:'restaurant restaurants cafe menu food eat dining ubereats foodpanda yelp',sale:'sale deal deals discount coupon promo shopee lazada amazon voucher',location:'maps map place address directions',activity:'event events activities activity workshop class',finds:'tips tip hack hacks useful tool tools gadget gadgets diy review reviews'};
 function safeDec(s){try{return decodeURIComponent(s)}catch(e){return s}}
 function words(u){let x;try{x=new URL(u)}catch(e){return null}
  const h=x.hostname.replace(/^www[.]/,'').split('.');let parts=[h.length>1?h[h.length-2]:h[0]];
@@ -211,6 +215,8 @@ $('theme').onclick=()=>{const toLight=document.documentElement.dataset.theme==='
 let popBuf=null,lastPop=0;
 function magic(){try{audioReady();if(!AC)return;const now=AC.currentTime;
  [1046.5,1318.51,1567.98,2093,2637.02].forEach((f,i)=>{const s=now+i*.055,v=.06-i*.006,dur=.35+i*.1;[[1,v],[2,v*.25]].forEach(([m,a])=>{const o=AC.createOscillator(),g=AC.createGain();o.type='sine';o.frequency.value=f*m;g.gain.setValueAtTime(.0001,s);g.gain.linearRampToValueAtTime(a,s+.012);g.gain.exponentialRampToValueAtTime(.0001,s+dur);o.connect(g);g.connect(AC.destination);o.start(s);o.stop(s+dur+.02)})})}catch(e){}}
+function chime(){try{audioReady();if(!AC)return;const now=AC.currentTime;
+ [[783.99,0],[1174.66,.09]].forEach(([f,dt])=>{[[1,.11,.8],[2.76,.02,.3],[5.4,.005,.15]].forEach(([m,v,dur])=>{const o=AC.createOscillator(),g=AC.createGain(),s=now+dt;o.type='sine';o.frequency.value=f*m;g.gain.setValueAtTime(.0001,s);g.gain.linearRampToValueAtTime(v,s+.015);g.gain.exponentialRampToValueAtTime(.0001,s+dur);o.connect(g);g.connect(AC.destination);o.start(s);o.stop(s+dur+.02)})})}catch(e){}}
 function audioReady(){try{AC=AC||new (window.AudioContext||window.webkitAudioContext)();if(AC.state==='suspended')AC.resume();if(!popBuf){const n=Math.floor(AC.sampleRate*.04),b=AC.createBuffer(1,n,AC.sampleRate),d=b.getChannelData(0);for(let i=0;i<n;i++)d[i]=(Math.random()*2-1)*Math.pow(1-i/n,2);popBuf=b}}catch(e){}}
 ['pointerdown','touchstart','keydown'].forEach(ev=>document.addEventListener(ev,audioReady,{once:true,passive:true}));
 function burst(el){
@@ -229,6 +235,28 @@ function popTile(t){
  setTimeout(go,150)}
 $('filters').addEventListener('pointerdown',e=>{const t=e.target.closest('[data-k]');if(t)popTile(t)});
 $('filters').onclick=e=>{const t=e.target.closest('[data-k]');if(t&&!popping&&Date.now()-lastPop>800)popTile(t)};
+let toastT;
+function toast(msg,cat){const t=$('toast');t.textContent=msg;t.hidden=false;t.onclick=()=>{t.hidden=true;if(cat)location.hash=cat};clearTimeout(toastT);toastT=setTimeout(()=>{t.hidden=true},5500)}
+function sysPerm(){try{return typeof Notification!=='undefined'&&Notification.permission==='granted'}catch(e){return false}}
+let notifyOn=false;try{notifyOn=localStorage.getItem('vault.notify')==='1'}catch(e){}
+function drawBell(){$('bell').textContent=notifyOn?'🔔':'🔕';$('bell').title=notifyOn?'Notifications on':'Notifications off'}
+$('bell').onclick=async()=>{
+ notifyOn=!notifyOn;try{localStorage.setItem('vault.notify',notifyOn?'1':'0')}catch(e){}
+ drawBell();
+ if(!notifyOn){toast('Notifications off');return}
+ let ok=sysPerm();
+ try{if(!ok&&typeof Notification!=='undefined')ok=(await Notification.requestPermission())==='granted'}catch(e){}
+ toast(ok?'🔔 Notifications on':'🔔 On. You will see alerts while the app is open')};
+window.vaultNotify=it=>{
+ if(!notifyOn)return;
+ const cat=CATS[it.cat]?it.cat:'activity',msg=`${it.by||'Someone'} added a link in ${CATS[cat][0]}`;
+ if(document.hidden&&sysPerm()){
+  const title='The Vault 🪄 · '+msg,o={body:it.title||brand(it.url),tag:'vault-'+(it.id||Date.now()),icon:'icon-192.png'};
+  const sw=navigator.serviceWorker&&navigator.serviceWorker.controller;
+  (sw?navigator.serviceWorker.ready.then(r=>r.showNotification(title,o)):Promise.reject()).catch(()=>{try{new Notification(title,o)}catch(e){}})
+ }else{chime();toast('🔔 '+msg,cat)}};
+window.vaultWelcome=n=>{if(notifyOn&&n>0)toast(`🔔 ${n} new link${n>1?'s':''} since your last visit`)};
+drawBell();
 setTheme(savedTheme);
 load();drawPick();draw();
 // Share target: receive links shared from other apps (Android installed PWA)
